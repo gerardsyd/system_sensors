@@ -4,6 +4,7 @@ import re
 import time
 import pytz
 import psutil
+import sensors as pysensors
 import socket
 import platform
 import subprocess
@@ -12,7 +13,6 @@ import sys
 
 # Only needed if using alternate method of obtaining CPU temperature (see commented out code for approach)
 #from os import walk
-
 
 rpi_power_disabled = True
 try:
@@ -214,6 +214,30 @@ def external_drive_base(drive, drive_path) -> dict:
         'icon': 'harddisk',
         'sensor_type': 'sensor',
         'function': lambda: get_disk_usage(f'{drive_path}')
+        }
+
+def get_fan_speed(fan_name):
+    pysensors.init()
+    fan_speed = None
+    try:
+        for chip in pysensors.iter_detected_chips():
+            chip_name = chip
+            for feature in chip:
+                if 'fan' in feature.label:
+                    if f'{chip_name}_{feature.label}' == fan_name:
+                        fan_speed = feature.get_value()
+    finally:
+        pysensors.cleanup()
+    return fan_speed
+
+# Builds an external drive entry to fix incorrect usage reporting
+def fan_base(fan_name) -> dict:
+    return {
+        'name': f'Fan Speed {fan_name}',
+        'unit': 'RPM',
+        'icon': 'fan',
+        'sensor_type': 'sensor',
+        'function': lambda: get_fan_speed(f'{fan_name}')
         }
 
 sensors = {

@@ -10,14 +10,14 @@ import argparse
 import threading
 import paho.mqtt.client as mqtt
 
-from sensors import * 
-
+from sensors_local import * 
 
 mqttClient = None
 global poll_interval
 devicename = None
 settings = {}
 external_drives = []
+fans_sensors = []
 
 class ProgramKilled(Exception):
     pass
@@ -49,7 +49,7 @@ def update_sensors():
     payload_str = f'{{'
     for sensor, attr in sensors.items():
         # Skip sensors that have been disabled or are missing
-        if sensor in external_drives or (settings['sensors'][sensor] is not None and settings['sensors'][sensor] == True):
+        if sensor in external_drives or sensor in fans_sensors or (settings['sensors'][sensor] is not None and settings['sensors'][sensor] == True):
             payload_str += f'"{sensor}": "{attr["function"]()}",'
     payload_str = payload_str[:-1]
     payload_str += f'}}'
@@ -64,11 +64,10 @@ def update_sensors():
 def send_config_message(mqttClient):
 
     write_message_to_console('Sending config message to host...')     
-
     for sensor, attr in sensors.items():
         try:
             # Added check in case sensor is an external drive, which is nested in the config
-            if sensor in external_drives or settings['sensors'][sensor]:
+            if (sensor in external_drives) or (sensor in fans_sensors) or (settings['sensors'][sensor]):
                 mqttClient.publish(
                     topic=f'homeassistant/{attr["sensor_type"]}/{devicename}/{sensor}/config',
                     payload = (f'{{'
@@ -113,6 +112,8 @@ def set_defaults(settings):
             settings['sensors'][sensor] = True
     if 'external_drives' not in settings['sensors'] or settings['sensors']['external_drives'] is None:
         settings['sensors']['external_drives'] = {}
+    if 'fans' not in settings['sensors'] or settings['sensors']['fans'] is None:
+        settings['sensors']['fans'] = {}
 
     # 'settings' argument is local, so needs to be returned to overwrite the one in the main function
     return settings
@@ -151,6 +152,13 @@ def add_drives():
             else:
                 # Skip drives not found. Could be worth sending "not mounted" as the value if users want to track mount status.
                 print(drive + ' is not mounted to host. Check config or host drive mount settings.')
+
+def add_fans():
+    fans = settings['sensors']['fans']
+    if fans is not None:
+        for fan in fans:
+            sensors[f'fan_speed_{fan.lower()}'] = fan_base(fans[fan])
+            fans_sensors.append(f'fan_speed_{fan.lower()}')
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -194,6 +202,7 @@ if __name__ == '__main__':
     check_settings(settings)
     
     add_drives()
+    add_fans()
 
     devicename = settings['devicename'].replace(' ', '').lower()
     deviceNameDisplay = settings['devicename']
