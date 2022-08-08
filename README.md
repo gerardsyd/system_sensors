@@ -8,6 +8,9 @@
 
 [![Community Forum][forum-shield]][forum]
 
+EDIT: I have updated the repo to use Sennevds but to include sensors from lm_snensors. In particular, this version also reports fan RPMs for my use case.
+
+
 I’ve created a simple python script that runs every 60 seconds and sends several system data over MQTT. It uses the MQTT Discovery for Home Assistant so you don’t need to configure anything in Home Assistant if you have discovery enabled for MQTT
 
 It currently logs the following data:
