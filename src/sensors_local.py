@@ -273,16 +273,19 @@ sensors = {
                  'function': get_cpu_usage},
           'load_1m':
                 {'name': 'Load 1m',
+                 'unit': '%',
                  'icon': 'cpu-64-bit',
                  'sensor_type': 'sensor',
                  'function': lambda: get_load(0)},
           'load_5m':
                 {'name': 'Load 5m',
+                 'unit': '%',
                  'icon': 'cpu-64-bit',
                  'sensor_type': 'sensor',
                  'function': lambda: get_load(1)},
           'load_15m':
                 {'name': 'Load 15m',
+                 'unit': '%',
                  'icon': 'cpu-64-bit',
                  'sensor_type': 'sensor',
                  'function': lambda: get_load(2)},
