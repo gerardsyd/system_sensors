@@ -111,5 +111,5 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-/src/settings.yaml
+#/src/settings.yaml
 system_sensors.service
