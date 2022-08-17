@@ -1,0 +1,38 @@
+mqtt:
+  hostname: 192.168.1.180
+  port: 1883 #defaults to 1883
+  user: homeassistant
+  password: r789qz'0
+deviceName: CullenHubSensors
+client_id: homeassistant
+timezone: Australia/Sydney
+update_interval: 60 #Defaults to 60
+sensors:
+  temperature: true
+  clock_speed: true
+  disk_use: true
+  memory_use: true
+  cpu_usage: true
+  load_1m: true
+  load_5m: true
+  load_15m: true
+  net_tx: true
+  net_rx: true
+  swap_usage: true
+  power_status: true
+  last_boot: true
+  hostname: false
+  host_ip: false
+  host_os: false
+  host_arch: false
+  last_message: true
+  updates: true
+  wifi_strength: true
+  wifi_ssid: true
+  fans: 
+    fan1: nct6779-isa-0290_fan1
+    fan2: nct6779-isa-0290_fan2
+    fan3: nct6779-isa-0290_fan3
+  # external_drives:
+    # Only add mounted drives here, e.g.:
+    # Drive1: /media/storage
